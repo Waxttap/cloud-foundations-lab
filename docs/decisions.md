@@ -74,3 +74,15 @@ Tradeoff: asumir un rol requiere que el servicio tenga permiso de sts:AssumeRole
 Resultado: app-role con inline policy de privilegio minimo sobre course-data-raw.
 
 Nota sobre el entorno: LocalStack Community no hace enforcement de politicas. Un Deny explicito no bloquea la llamada (se verifico en el paso 9). Para ver enforcement real se necesita LocalStack Pro o AWS real.
+### 006 - Instance profile en lugar de access keys en la instancia
+
+Decision: usar instance profile (rol via IMDSv2) en lugar de access keys hardcodeadas en la VM.
+
+Contexto: una instancia que necesita leer S3 puede acceder por dos caminos: (a) access keys guardadas en disco, o (b) un rol asociado via instance profile que devuelve credenciales temporales por IMDSv2.
+
+Tradeoff: la opcion (a) es mas directa pero deja claves de larga duracion en disco; si la instancia se compromete o se snapshotea, esas claves quedan expuestas. La opcion (b) requiere setup inicial pero las credenciales rotan automaticamente y nunca tocan disco.
+
+Resultado: instance profile 'app-instance-profile' con el rol 'app-role' del lab 04, adjuntado a una instancia EC2 con security group web-sg (puertos 80 y 22).
+
+
+
